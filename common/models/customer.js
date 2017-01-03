@@ -10,14 +10,14 @@ module.exports = function(Customer) {
   Customer.disableRemoteMethod('deleteById', true);
   Customer.disableRemoteMethod('findById', true);
   Customer.disableRemoteMethod('create', true);
-  Customer.disableRemoteMethod('find', false);
+  Customer.disableRemoteMethod('find', true);
   Customer.disableRemoteMethod('exists', true);
   Customer.disableRemoteMethod('replace', true);
   Customer.disableRemoteMethod('replaceById', true);
   Customer.disableRemoteMethod('replaceOrCreate', true);
   Customer.disableRemoteMethod('updateById', true);
   Customer.disableRemoteMethod('upsertWithWhere', true);
-  Customer.disableRemoteMethod('updateAttributes', true);
+  Customer.disableRemoteMethod('updateAttributes', false);
   Customer.disableRemoteMethod('count', true);
   var regex = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
   Customer.validatesUniquenessOf('email', {
@@ -34,7 +34,7 @@ module.exports = function(Customer) {
       ctx.query = filter = {};
     }
     if (!filter.order) {
-      filter.order = ["created DESC"];
+      filter.order = ["lastUpdated DESC"];
     }
     next();
   });
@@ -44,6 +44,7 @@ module.exports = function(Customer) {
     if (ctx.instance) {
       if (ctx.isNewInstance) {
         ctx.instance.joiningDate = new Date();
+        ctx.instance.lastUpdated = new Date();
         if (ctx.instance.referralId) {
           Customer.findById(ctx.instance.referralId, function(err, referrer) {
             if (!referrer || err) {
